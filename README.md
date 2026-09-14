@@ -28,6 +28,8 @@ VasQ is intended for atlas exploration and hypothesis generation, not clinical d
 
 # 🏗️ Architecture
 
+![VasQ workflow architecture](VasQ_workflow.png)
+
 The active VasQ application is implemented in `vasq/` using Django 4.2, django-ninja, WhiteNoise, and Plotly.js. OpenAI Chat Completions are used for classification and synthesis, while the OpenAI Responses API with Web Search is used for live scientific and drug-evidence retrieval.
 
 **Current request flow:**
@@ -50,7 +52,7 @@ The active expression workflow reads from `/data` inside the container (`DATA_DI
 | `VasQ_cell_meta_table.csv` | Per-nucleus metadata, including region, region layer, cell class, cell type, age at death, and sex. |
 | `VasQ_gene_names.csv` | Gene symbols aligned to the matrix columns. |
 
-The matrix and cell-metadata files are not distributed in the public repository and must be supplied separately by authorized users.
+Because the log-normalized expression matrix exceeds GitHub's file-size limits, the expression data files can be downloaded from [Figshare](https://figshare.com/account/articles/33420964). During peer review, the files are accessible to reviewers through the private link provided and will be publicly released upon acceptance.
 
 ---
 
@@ -76,9 +78,9 @@ git lfs install
 git lfs pull
 ```
 
-**3. Add the expression data**
+**3. Download and add the expression data**
 
-Place the following files in `vasq/data/` so that Docker can mount them at `/data`:
+Download the expression data files from [Figshare](https://figshare.com/account/articles/33420964), then place the following files in `vasq/data/` so that Docker can mount them at `/data`:
 
 - `VasQ_adata_X_sparse.npz`
 - `VasQ_cell_meta_table.csv`
