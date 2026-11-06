@@ -52,7 +52,7 @@ The active expression workflow reads from `/data` inside the container (`DATA_DI
 | `VasQ_cell_meta_table.csv` | Per-nucleus metadata, including region, region layer, cell class, cell type, age at death, and sex. |
 | `VasQ_gene_names.csv` | Gene symbols aligned to the matrix columns. |
 
-Because the log-normalized expression matrix exceeds GitHub's file-size limits, the expression data files can be downloaded from [Figshare](https://figshare.com/account/articles/33420964). During peer review, the files are accessible to reviewers through the private link provided and will be publicly released upon acceptance.
+Because the log-normalized expression matrix exceeds GitHub's file-size limits, the expression data files can be downloaded from [Figshare](https://figshare.com/projects/Atlas_of_Regional_Molecular_Specialization_in_the_Human_Brain_Vasculature/273930). During peer review, the files are accessible to reviewers through the private link provided and will be publicly released upon acceptance.
 
 ---
 
