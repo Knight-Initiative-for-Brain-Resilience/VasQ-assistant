@@ -15,19 +15,25 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-5co^ow2g72(%lmchgj(t&3qp08-9_)1(zj)por-b)=$@@)-$gn'
+# Override this with a private value for any public deployment.
+SECRET_KEY = os.getenv(
+    "DJANGO_SECRET_KEY", 'django-insecure-5co^ow2g72(%lmchgj(t&3qp08-9_)1(zj)por-b)=$@@)-$gn'
+)
 
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
-    "127.0.0.1",
-    "localhost",
-    "vasq-production-65c6.up.railway.app",
+    host.strip() for host in os.getenv(
+        "ALLOWED_HOSTS",
+        "127.0.0.1,localhost,vasq-production-65c6.up.railway.app",
+    ).split(",") if host.strip()
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://127.0.0.1:8000",
-    "https://vasq-production-65c6.up.railway.app",
+    origin.strip() for origin in os.getenv(
+        "CSRF_TRUSTED_ORIGINS",
+        "http://127.0.0.1:8000,https://vasq-production-65c6.up.railway.app",
+    ).split(",") if origin.strip()
 ]
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
