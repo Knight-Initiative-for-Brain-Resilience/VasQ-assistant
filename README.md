@@ -104,7 +104,7 @@ Download the expression data from the [VasQ Figshare project](https://figshare.c
 | `VasQ_cell_meta_table.csv` | Per-nucleus region, region layer, cell class, cell type, age at death, and sex. |
 | `VasQ_gene_names.csv` | Gene symbols in the same order as the matrix columns. |
 
-The matrix and cell-metadata files are not included in this code package. The gene-name file is included; use the matching matrix and metadata from the same dataset release. If the Figshare files are not accessible, contact the authors for the data or a private access link before continuing. Local expression analysis requires all three files.
+All three expression data files are distributed through Figshare and must be downloaded into `vasq/data/` before running VasQ locally. If the Figshare files are not accessible, contact the authors for the data or a private access link before continuing. Local expression analysis requires all three files.
 
 Docker mounts `vasq/data/` at `/data` inside the application container. Downloaded data are excluded from Git by default.
 
