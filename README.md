@@ -175,7 +175,7 @@ The [Figshare dataset](https://figshare.com/projects/Atlas_of_Regional_Molecular
 
 ### Demo runtime
 
-Each question typically takes approximately 4–6 minutes to complete. Runtime varies with query complexity, dataset loading, API response times, and web retrieval. In Run Queue mode, questions are processed sequentially, so the total runtime increases with the number of questions.
+Each question typically takes approximately 1–6 minutes to complete. Runtime varies with query complexity, dataset loading, API response times, and web retrieval. In Run Queue mode, questions are processed sequentially, so the total runtime increases with the number of questions.
 
 ## Using your own expression data
 
