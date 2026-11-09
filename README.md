@@ -209,31 +209,11 @@ The number of metadata rows must equal the number of matrix rows, and the number
 
 ## 3. Optional: Deploy on Railway
 
-Railway is an alternative to running VasQ locally. It hosts your own instance for web access and requires your own Railway account and OpenAI API key. You are responsible for API usage and hosting costs. To use the existing free hosted website, no deployment is needed.
+To host your own VasQ instance, deploy the repository on Railway using `vasq/Dockerfile.railway` and configure your OpenAI API key and application settings.
 
-At a high level:
+Store the three expression data files in a persistent volume mounted at `/data`; the data files do not need to be uploaded to GitHub.
 
-1. **Deploy the code.** Connect a GitHub repository containing VasQ to a Railway service. Use the repository root as the build root and select `vasq/Dockerfile.railway` as the deployment Dockerfile. It configures Python 3.11 and Gunicorn separately from the local Docker setup.
-2. **Configure the service.** Add your OpenAI API key and model settings as service environment variables. Set the Django secret key, disable debug mode, and configure the allowed hostname and trusted HTTPS origin for your domain. Keep API credentials private.
-3. **Store the data separately.** Attach a persistent Railway volume at `/data` and upload or download the three expression files listed above into it. The large data files do not need to be committed to GitHub. Files on your local computer are not automatically available to the deployed service. Ensure the service has enough storage and memory for the dataset.
-4. **Verify the deployment.** Open your service's `/vasq/` page and submit an expression query. Confirm that a response, results table, and plot are returned.
-
-Visitors use the credentials configured on your service; they do not need their own API keys. This version does not implement visitor login. For platform setup details, see the [Railway Dockerfile](https://docs.railway.com/builds/dockerfiles) and [persistent volume](https://docs.railway.com/volumes) documentation.
-
-## How it works
-
-The active application is in `vasq/`, using Django, django-ninja, WhiteNoise, and Plotly.js. It classifies questions and resolves entities, computes atlas expression summaries when applicable, retrieves scientific or therapeutic evidence when requested, and synthesizes the results. OpenAI Chat Completions supports classification and synthesis; the Responses API supports web search.
-
-The current workflow does not require SPOKE/KG-RAG or Google Vertex AI Search.
-
-## Troubleshooting
-
-| Problem | What to check |
-| --- | --- |
-| Local address does not open | Ensure Docker Engine is running, start the application with `docker compose up`, and check that port 8000 is available. |
-| Missing data or no expression results | Confirm all three real data files are available at `/data` inside the running container and belong to the same release. |
-| API authentication or model-access error | Check the key, account access, model names, and reasoning settings on the instance you are running. |
-| Railway hostname or CSRF error | Set `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS` for your own domain, then redeploy. |
+An independent deployment requires your own Railway account and OpenAI API key, with associated API and hosting costs. No deployment is needed to use our free hosted website.
 
 ## Acknowledgements
 
