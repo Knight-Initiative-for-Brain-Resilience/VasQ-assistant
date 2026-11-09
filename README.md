@@ -54,39 +54,42 @@ Git is needed only if you clone the repository rather than download a ZIP. Pytho
 
 ### Software dependencies
 
-Python dependencies are listed in [`vasq/requirements.txt`](vasq/requirements.txt) and installed automatically during the Docker build:
+Python dependencies are listed in [`vasq/requirements.txt`](vasq/requirements.txt) and installed automatically during the Docker build. The table lists declared requirements; runtime-confirmed versions are noted separately:
 
-| Package | Declared version |
-| --- | --- |
-| Django | 4.2.15 |
-| django-ninja | 1.3.0 |
-| OpenAI Python SDK | 2.53.0 |
-| HTTPX | 0.27.0 |
-| pandas | 1.5.3 |
-| NumPy | 1.26.4 |
-| SciPy | 1.13.1 |
-| Requests | 2.32.3 |
-| tiktoken | >=0.12.0 |
-| WhiteNoise | Not pinned |
+| Package | Declared requirement | Runtime-confirmed version |
+| --- | --- | --- |
+| Django | 4.2.15 | 4.2.15 |
+| django-ninja | 1.3.0 | Not recorded |
+| OpenAI Python SDK | 2.53.0 | 2.53.0 |
+| HTTPX | 0.27.0 | Not recorded |
+| pandas | 1.5.3 | Not recorded |
+| NumPy | 1.26.4 | Not recorded |
+| SciPy | 1.13.1 | Not recorded |
+| Requests | 2.32.3 | Not recorded |
+| tiktoken | >=0.12.0 | Not recorded |
+| WhiteNoise | Not pinned | Not recorded |
 
 System dependencies are installed automatically during the Docker build; see [`vasq/Dockerfile`](vasq/Dockerfile). The web interface also loads JavaScript libraries, stylesheets, and fonts from external CDNs, so internet access is required.
 
-### Test environment and installation time
+### Tested environment and build time
 
-Local validation on macOS is pending. The entries below will be completed after testing; they are not verified requirements or benchmark results.
+Local installation, startup, and an example query were successfully tested on an Apple silicon Mac using Docker Desktop on November 9, 2026.
 
-| Test detail | Recorded value |
+| Component | Test configuration |
 | --- | --- |
-| macOS version | Pending |
-| Mac model and chip/processor | Pending |
-| RAM | Pending |
-| Docker Desktop and Docker Compose versions | Pending |
-| Container Python version and installed dependency versions | Pending |
-| Browser and version | Pending |
-| Tested code commit and dataset release | Pending |
-| Docker build and initialization time (excluding dataset download) | Pending |
-| Dataset download time and size | Pending |
-| First and subsequent demo query runtimes | Pending |
+| Host platform | macOS on Apple silicon |
+| Docker Desktop | 4.99.0 |
+| Docker Engine / CLI | 29.9.3, build `5457199` (reported by `docker --version`) |
+| Docker Compose | v5.7.0 |
+| Container Python | Python 3.11, using `python:3.11-slim` |
+| Django | 4.2.15, confirmed in the startup log |
+| OpenAI Python SDK | 2.53.0, confirmed in the runtime log |
+
+The exact macOS version, Mac chip model, RAM, browser version, Python patch version, and remaining installed package versions were not captured in the supplied test record.
+
+The recorded `docker compose build` wall-clock time was **62.19 seconds (approximately 1 minute)**, including the base-image download and dependency installation. This is the image-build time only; it excludes Docker Desktop installation, code and dataset downloads, API configuration, database initialization, static-file collection, and application startup. Build times vary with hardware, network speed, and Docker caching.
+
+Database migration and static-file collection completed successfully, and the application served the local web interface and its CSS, JavaScript, and image assets.
 
 ### Download the code
 
@@ -95,7 +98,7 @@ git clone --branch railway-deploy https://github.com/Knight-Initiative-for-Brain
 cd VasQ-assistant
 ```
 
-Run the following setup steps from this repository root. The final command prints the downloaded commit identifier for the test record.
+Run the following setup steps from this repository root. If you downloaded a ZIP, open a terminal in the extracted repository folder instead.
 
 ### Add the expression data
 
@@ -174,7 +177,7 @@ The [Figshare dataset](https://figshare.com/projects/Atlas_of_Regional_Molecular
 
 ### Demo runtime
 
-Observed runs have taken approximately 4–6 minutes per question. Local macOS timings are pending. Runtime varies with query complexity, dataset loading, API response times, and web retrieval. In Run Queue mode, questions are processed sequentially, so the total runtime increases with the number of questions.
+Each question typically takes approximately 4–6 minutes to complete. Runtime varies with query complexity, dataset loading, API response times, and web retrieval. In Run Queue mode, questions are processed sequentially, so the total runtime increases with the number of questions.
 
 ## Using your own expression data
 
