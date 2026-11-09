@@ -4,6 +4,8 @@
 
 **VasQ** is an AI chat system for exploring a human brain vascular single-nucleus RNA-seq atlas and generating biomedical hypotheses about blood-brain barrier biology, regional vascular specialization, and drug delivery.
 
+![VasQ workflow](VasQ_workflow.png)
+
 ## 1. Use VasQ online
 
 **[Open VasQ](https://vasq-production-65c6.up.railway.app/vasq/)**
@@ -23,7 +25,7 @@ VasQ is intended for research exploration and hypothesis generation, not clinica
 - Natural-language expression queries with filters for brain region, region layer, cell class, cell type, and sex.
 - Matrix-derived mean log-normalized expression, percentage of expressing cells, and cell counts; groups with fewer than 10 cells are excluded.
 - Interactive expression plots, a paginated results table, and CSV downloads. For multi-gene queries, eligible results remain in the table and up to three gene profiles are plotted.
-- Scientific evidence retrieval with source links, plus drug and small-molecule evidence when explicitly requested.
+- Scientific evidence retrieval with source links, including drug and small-molecule evidence when the query specifically asks about them.
 
 The atlas covers 41 brain regions, approximately 443,000 nuclei, and approximately 15,000 highly variable genes. Expression results are calculated directly from the matrix. The complete matrix, individual-cell records, and full expression table are not sent to the language model; a compact set of aggregate results is provided for interpretation.
 
@@ -37,20 +39,19 @@ The atlas covers 41 brain regions, approximately 443,000 nuclei, and approximate
 
 Free access applies to the hosted website. If you run your own copy, you are responsible for its API usage and any hosting costs.
 
-## 2. Run VasQ locally
+## 2. Run VasQ locally on Linux
 
 ### System requirements
 
-The provided Dockerfiles run a Linux-based Python environment. Local setup is intended for macOS, Windows, or Linux with a working Docker installation; this is a deployment target, not a claim that every host operating system has been tested.
+The local instructions below describe a Linux setup using Docker Engine and the Docker Compose plugin. The application runs inside a Linux-based Python container. A Railway account is not required for local installation. Actual tested environment versions are not yet recorded; see the testing notes below.
 
 | Component | Requirement or configured version |
 | --- | --- |
-| Container runtime | Docker Desktop with Docker Compose, or Docker Engine with the Compose plugin on Linux. The Compose commands below use `docker compose`. |
-| Python, local container | Python 3.10, configured by `vasq/Dockerfile`. |
-| Python, Railway container | Python 3.11, configured by `vasq/Dockerfile.railway`. |
+| Container runtime | Docker Engine with the Docker Compose plugin on Linux. The commands below use `docker compose`. |
+| Python inside the container | Python 3.10, configured by `vasq/Dockerfile`. |
 | Browser | A browser with JavaScript enabled for the web interface. |
 | Network | Required for OpenAI API calls, web retrieval, initial image/package downloads, and browser assets loaded from external CDNs. |
-| API access | Your own OpenAI API key and access to compatible models for a locally run or independently hosted copy. |
+| API access | Your own OpenAI API key and access to compatible models for your local instance. |
 | Data | The three matching expression files described below. |
 | Hardware | The application uses CPU-based matrix analysis and remotely hosted OpenAI models. No local GPU or other specialized hardware is required by the provided workflow. |
 | Memory and disk | Sufficient RAM to load the selected matrix and metadata, and disk space for the data and Docker images. Minimum requirements have not been benchmarked for this release. |
@@ -73,15 +74,14 @@ The following server dependencies are declared in [`vasq/requirements.txt`](vasq
 | Requests | 2.32.3 |
 | tiktoken | >=0.12.0 |
 | WhiteNoise | Not pinned |
-| Gunicorn | Installed separately by `vasq/Dockerfile.railway`; not pinned |
 
-Both Dockerfiles install the following system packages through `apt-get`: `gcc`, `gfortran`, `g++`, `libblas-dev`, `libhdf5-dev`, `liblapack-dev`, `libopenblas-dev`, and `python3-dev`. Their exact versions and the Python patch versions are not pinned.
+The local Dockerfile installs the following system packages through `apt-get`: `gcc`, `gfortran`, `g++`, `libblas-dev`, `libhdf5-dev`, `liblapack-dev`, `libopenblas-dev`, and `python3-dev`. Their exact versions and the Python patch versions are not pinned.
 
 The web interface loads Plotly.js (`plotly-latest.min.js`, not pinned), marked 4.0.0, html2pdf.js 0.10.1, JSZip 3.10.1, Font Awesome 5.15.4, and Satoshi fonts from external CDNs. See [`index.html`](vasq/vasq/templates/vasq/index.html) for the requested asset URLs. No Node.js build step is included in the provided setup.
 
 ### Tested environments and installation time
 
-The Python versions above describe the supplied Docker configuration. Exact tested host OS versions, Docker/Compose versions, browser versions, and a frozen list of installed package versions have not been recorded in the supplied release materials. The hosted application is deployed on Railway, as reported by the maintainers.
+Python 3.10 describes the local Docker configuration, not a verified test environment. Exact tested Linux distribution/version, Docker/Compose versions, browser versions, and a frozen list of installed package versions have not yet been recorded in the supplied release materials.
 
 A typical installation time on a standard desktop computer has not yet been measured. The initial build downloads a Python image and installs dependencies; total setup time also depends on network speed and dataset download size. Record the elapsed build/setup time together with the machine specification before reporting a benchmark.
 
@@ -207,48 +207,20 @@ VasQ is configured for the supplied human brain vascular atlas. Replacing the ex
 
 The number of metadata rows must equal the number of matrix rows, and the number of gene-name entries must equal the number of matrix columns. Use trusted data files, retain the same normalization convention when comparing datasets, and validate region and cell-type resolution for any new vocabulary. The minimum group size of 10 cells still applies.
 
-## 3. Deploy your own instance on Railway
+## 3. Optional: Deploy on Railway
 
-This is optional. Use the hosted website if you only want to ask questions.
+Railway is an alternative to running VasQ locally. It hosts your own instance for web access and requires your own Railway account and OpenAI API key. You are responsible for API usage and hosting costs. To use the existing free hosted website, no deployment is needed.
 
-### Create and configure the service
+At a high level:
 
-1. Put the code in a GitHub repository you control and create a Railway service connected to it. Select the branch containing this version of VasQ.
-2. Keep the Railway build root at the **repository root**, because the deployment Dockerfile copies files using `vasq/` paths.
-3. Set `RAILWAY_DOCKERFILE_PATH=vasq/Dockerfile.railway` in the service variables. See [Railway's Dockerfile guide](https://docs.railway.com/builds/dockerfiles).
-4. Add the OpenAI variables from `.env-shared.example` to Railway's service variables, using **your own API key**. Railway does not read your local `.env-shared` automatically.
-5. Generate a long random secret and set `DJANGO_SECRET_KEY` to it. For example, run `python -c 'import secrets; print(secrets.token_urlsafe(50))'` on your computer. Set `DEBUG=False`.
-6. Generate a public domain for the service. Set `ALLOWED_HOSTS` to its hostname, such as `your-service.up.railway.app`, and `CSRF_TRUSTED_ORIGINS` to its full HTTPS origin, such as `https://your-service.up.railway.app`. Multiple entries can be separated by commas.
+1. **Deploy the code.** Connect a GitHub repository containing VasQ to a Railway service. Use the repository root as the build root and select `vasq/Dockerfile.railway` as the deployment Dockerfile. It configures Python 3.11 and Gunicorn separately from the local Docker setup.
+2. **Configure the service.** Add your OpenAI API key and model settings as service environment variables. Set the Django secret key, disable debug mode, and configure the allowed hostname and trusted HTTPS origin for your domain. Keep API credentials private.
+3. **Store the data separately.** Attach a persistent Railway volume at `/data` and upload or download the three expression files listed above into it. The large data files do not need to be committed to GitHub. Files on your local computer are not automatically available to the deployed service. Ensure the service has enough storage and memory for the dataset.
+4. **Verify the deployment.** Open your service's `/vasq/` page and submit an expression query. Confirm that a response, results table, and plot are returned.
 
-### Provide the expression data
-
-All three data files must exist under `/data` **inside the deployed service**. Running successfully on your computer does not upload those files to Railway.
-
-For a GitHub-based deployment, attach a [Railway volume](https://docs.railway.com/volumes) at `/data` and populate it with the three files before running expression queries. Transfer or download the actual dataset files into that volume using an authorized data source. A Figshare project page is not a direct file-download URL.
-
-Use the current [Railway CLI volume-file commands](https://docs.railway.com/cli/volume) to upload the files from your computer. After installing the CLI, run `railway login` and `railway link`, selecting your own project, environment, and VasQ service. From the repository root, run:
-
-```bash
-railway volume files upload ./vasq/data/VasQ_adata_X_sparse.npz /VasQ_adata_X_sparse.npz
-railway volume files upload ./vasq/data/VasQ_cell_meta_table.csv /VasQ_cell_meta_table.csv
-railway volume files upload ./vasq/data/VasQ_gene_names.csv /VasQ_gene_names.csv
-```
-
-Select the volume attached at `/data` if prompted. These remote paths are relative to the volume root, so `/VasQ_gene_names.csv` appears inside the container as `/data/VasQ_gene_names.csv`.
-
-The volume covers any files copied to `/data` during the image build; an attached empty volume still needs to be populated.
-
-### Start and verify
-
-The Dockerfile starts Gunicorn using Railway's `PORT` environment variable. It uses one worker with threads because chat jobs and result tables use an in-process cache. Keep this configuration unless you also add shared job and cache storage.
-
-After deployment, open `https://YOUR-RAILWAY-DOMAIN/vasq/`. Check that the page loads, then run an expression query and confirm that a table and plot are returned. A successful image build or page load alone does not confirm dataset access or API access.
-
-Your deployment uses your Railway resources and the OpenAI credentials you configure. Visitors do not need their own credentials. No visitor login or per-user API-key entry is implemented in this version.
+Visitors use the credentials configured on your service; they do not need their own API keys. This version does not implement visitor login. For platform setup details, see the [Railway Dockerfile](https://docs.railway.com/builds/dockerfiles) and [persistent volume](https://docs.railway.com/volumes) documentation.
 
 ## How it works
-
-![VasQ workflow](VasQ_workflow.png)
 
 The active application is in `vasq/`, using Django, django-ninja, WhiteNoise, and Plotly.js. It classifies questions and resolves entities, computes atlas expression summaries when applicable, retrieves scientific or therapeutic evidence when requested, and synthesizes the results. OpenAI Chat Completions supports classification and synthesis; the Responses API supports web search.
 
@@ -258,7 +230,7 @@ The current workflow does not require SPOKE/KG-RAG or Google Vertex AI Search.
 
 | Problem | What to check |
 | --- | --- |
-| Local address does not open | Start Docker Desktop and `docker compose up`; check that port 8000 is available. |
+| Local address does not open | Ensure Docker Engine is running, start the application with `docker compose up`, and check that port 8000 is available. |
 | Missing data or no expression results | Confirm all three real data files are available at `/data` inside the running container and belong to the same release. |
 | API authentication or model-access error | Check the key, account access, model names, and reasoning settings on the instance you are running. |
 | Railway hostname or CSRF error | Set `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS` for your own domain, then redeploy. |
