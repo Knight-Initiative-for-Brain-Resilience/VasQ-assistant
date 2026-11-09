@@ -213,8 +213,7 @@ To host your own VasQ instance, deploy the repository on Railway using `vasq/Doc
 
 Store the three expression data files in a persistent volume mounted at `/data`; the data files do not need to be uploaded to GitHub.
 
-An independent deployment requires your own Railway account and OpenAI API key, with associated API and hosting costs. No deployment is needed to use our free hosted website.
-
+An independent deployment requires your own Railway account and OpenAI API key, with associated API and hosting costs. 
 ## Acknowledgements
 
 VasQ was informed by [scChat](https://github.com/li-group/scChat) and [KG-RAG](https://github.com/BaranziniLab/KG_RAG). We acknowledge their contributions to conversational single-cell analysis and biomedical retrieval.
