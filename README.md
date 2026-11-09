@@ -75,9 +75,7 @@ The following server dependencies are declared in [`vasq/requirements.txt`](vasq
 | tiktoken | >=0.12.0 |
 | WhiteNoise | Not pinned |
 
-The local Dockerfile installs the following system packages through `apt-get`: `gcc`, `gfortran`, `g++`, `libblas-dev`, `libhdf5-dev`, `liblapack-dev`, `libopenblas-dev`, and `python3-dev`. Their exact versions and the Python patch versions are not pinned.
-
-The web interface loads Plotly.js (`plotly-latest.min.js`, not pinned), marked 4.0.0, html2pdf.js 0.10.1, JSZip 3.10.1, Font Awesome 5.15.4, and Satoshi fonts from external CDNs. See [`index.html`](vasq/vasq/templates/vasq/index.html) for the requested asset URLs. No Node.js build step is included in the provided setup.
+System dependencies are installed automatically during the Docker build; see [`vasq/Dockerfile`](vasq/Dockerfile). The web interface also loads JavaScript libraries, stylesheets, and fonts from external CDNs, so internet access is required. No separate Node.js installation or frontend build is needed.
 
 ### Tested environments and installation time
 
@@ -92,8 +90,6 @@ git clone --branch railway-deploy https://github.com/Knight-Initiative-for-Brain
 cd VasQ-assistant
 ```
 
-If you downloaded a ZIP instead, extract it and open a terminal in the extracted project folder. Run the remaining commands from that folder.
-
 ### Add the expression data
 
 Download the expression data from the [VasQ Figshare project](https://figshare.com/projects/Atlas_of_Regional_Molecular_Specialization_in_the_Human_Brain_Vasculature/273930) and place the following files in `vasq/data/`:
@@ -104,10 +100,7 @@ Download the expression data from the [VasQ Figshare project](https://figshare.c
 | `VasQ_cell_meta_table.csv` | Per-nucleus region, region layer, cell class, cell type, age at death, and sex. |
 | `VasQ_gene_names.csv` | Gene symbols in the same order as the matrix columns. |
 
-All three expression data files are distributed through Figshare and must be downloaded into `vasq/data/` before running VasQ locally. If the Figshare files are not accessible, contact the authors for the data or a private access link before continuing. Local expression analysis requires all three files.
-
-Docker mounts `vasq/data/` at `/data` inside the application container. Downloaded data are excluded from Git by default.
-
+Docker Compose mounts this directory at /data inside the application container in read-only mode.
 ### Configure your own OpenAI API key
 
 Copy the configuration template:
@@ -127,10 +120,9 @@ OPENAI_MAIN_REASONING_EFFORT=high
 OPENAI_HELPER_REASONING_EFFORT=none
 OPENAI_WEB_REASONING_EFFORT=high
 ```
+Use models available to your OpenAI API account that support VasQ’s required features. If you change models, adjust the reasoning settings as needed.
 
-These are the model settings documented for the hosted VasQ workflow; model access depends on your API account. If you select alternative models, verify support for the Chat Completions features, structured output, and Responses API web search used by VasQ, and adjust reasoning settings as needed.
-
-Keep `.env-shared` private. It is excluded from Git and Docker image builds; Docker Compose loads it as runtime environment variables.
+Keep `.env-shared` private and excluded from Git and Docker images. Docker Compose loads its settings when the application starts.
 
 ### Start the web interface
 
@@ -140,24 +132,15 @@ docker compose build
 docker compose run --rm web python manage.py migrate --noinput
 docker compose up
 ```
-
-Open **[VasQ on your computer](http://127.0.0.1:8000/vasq/)** in your browser. This address refers to your own computer and works after the application starts.
-
-Stop the application with `Ctrl+C`, then remove its containers with:
-
-```bash
-docker compose down
-```
-
-The local setup runs a single VasQ service. Git LFS and a separate knowledge-graph service are not required.
+For a remote server or computing cluster, use the address provided by your port-forwarding or institutional web access configuration.
 
 ## Demo using the Figshare dataset
 
-The [Figshare dataset](https://figshare.com/projects/Atlas_of_Regional_Molecular_Specialization_in_the_Human_Brain_Vasculature/273930) is the data source for this demo. Use the three matching files listed above; no separate reduced demo subset is distributed here. For review, ensure that the supplied download link or private access link allows the reviewers to retrieve the files.
+The [Figshare dataset](https://figshare.com/projects/Atlas_of_Regional_Molecular_Specialization_in_the_Human_Brain_Vasculature/273930) is the data source for this demo. Use the three matching files listed above.
 
 ### Run the demo
 
-1. Follow the local installation instructions above and open `http://127.0.0.1:8000/vasq/`, or open the hosted VasQ website to use the dataset already deployed by the maintainers.
+1. Open your running VasQ instance using the appropriate address described above, or use our hosted VasQ website **[Open VasQ](https://vasq-production-65c6.up.railway.app/vasq/)**.
 2. Submit each of the following example questions separately:
 
    **Example 1:** How do PLVAP, AQP1, and SLCO2A1 rank as markers for fenestrated capillary cells?
@@ -177,13 +160,11 @@ The [Figshare dataset](https://figshare.com/projects/Atlas_of_Regional_Molecular
 | 2. Small-vessel-disease susceptibility genes | A source-linked discussion of susceptibility genes and their expression patterns across relevant vascular cell types and brain regions, with expression tables and plots where applicable. Expression patterns should be distinguished from a formal statistical enrichment test. |
 | 3. Drug failure, BBB penetration, and receptor-mediated transcytosis | A source-linked assessment of drug-delivery evidence, distinguishing documented BBB penetration limitations from other reasons for failure and identifying whether a proposed transcytosis mechanism is supported. An expression plot or CSV is not required for this evidence-focused question. |
 
-**Reference output:** One PDF containing an actual VasQ example output is available to download and view in the [VasQ Figshare project](https://figshare.com/projects/Atlas_of_Regional_Molecular_Specialization_in_the_Human_Brain_Vasculature/273930), alongside the dataset. This PDF illustrates one example response and any tables or plots included in that run. It does not provide reference outputs for all three questions listed above.
-
-Expression values depend on the dataset release and selected groups. Literature results and generated wording can vary with sources, models, and query date; the example PDF documents one reference run rather than requiring identical generated text on every run. The example PDF is separate from the downloadable CSV tables generated by the web interface.
+**Run Queue mode:** Enter up to 20 questions, one per line, and click **Run Queue**. VasQ processes each question independently and sequentially, without carrying over conversation history between questions. A separate PDF report is automatically downloaded after each question is processed and for example view in the [VasQ Figshare project](https://figshare.com/projects/Atlas_of_Regional_Molecular_Specialization_in_the_Human_Brain_Vasculature/273930). Each report includes the question, the generated response with source links where provided, and any plots and tables displayed for that question. Full expression results, when available, can be downloaded separately as CSV from the web interface. Allow multiple downloads in your browser if prompted.
 
 ### Demo runtime
 
-Demo runtime on a standard desktop computer has not yet been benchmarked. The first expression query loads the matrix into memory and can take longer than subsequent queries. End-to-end time also includes API latency and, for literature questions, web retrieval. Measure the first query and subsequent queries separately and report the computer specification, dataset release, and model settings with the timings.
+Based on observed runs, each question typically takes approximately 4–6 minutes to complete. Runtime varies with query complexity, dataset loading, API response times, and web retrieval. In Run Queue mode, questions are processed sequentially, so the total runtime increases with the number of questions.
 
 ## Using your own expression data
 
