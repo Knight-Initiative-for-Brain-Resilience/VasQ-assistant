@@ -93,7 +93,6 @@ Local validation on macOS is pending. The entries below will be completed after 
 ```bash
 git clone --branch railway-deploy https://github.com/Knight-Initiative-for-Brain-Resilience/VasQ-assistant.git
 cd VasQ-assistant
-git rev-parse HEAD
 ```
 
 Run the following setup steps from this repository root. The final command prints the downloaded commit identifier for the test record.
