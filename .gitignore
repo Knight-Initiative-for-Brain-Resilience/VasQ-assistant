@@ -8,5 +8,4 @@ venv/
 .DS_Store
 *.sqlite3
 vasq/staticfiles/
-vasq/data/*
-!vasq/data/VasQ_gene_names.csv
+vasq/data/
