@@ -1463,7 +1463,7 @@ def initialize(history):
 
 
 ### Gene Expression Functions ###
-DATA_DIR = "/data"
+DATA_DIR = os.getenv("VASQ_DATA_DIR", "/data")
 MATRIX_NPZ_PATH = os.path.join(DATA_DIR, "VasQ_adata_X_sparse.npz")
 CELL_META_PATH = os.path.join(DATA_DIR, "VasQ_cell_meta_table.csv")
 GENE_NAMES_PATH = os.path.join(DATA_DIR, "VasQ_gene_names.csv")
