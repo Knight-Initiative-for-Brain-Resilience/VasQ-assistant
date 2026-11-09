@@ -54,20 +54,20 @@ Git is needed only if you clone the repository rather than download a ZIP. Pytho
 
 ### Software dependencies
 
-Python dependencies are listed in [`vasq/requirements.txt`](vasq/requirements.txt) and installed automatically during the Docker build. The table lists declared requirements; runtime-confirmed versions are noted separately:
+Python dependencies and version requirements are listed in [`vasq/requirements.txt`](vasq/requirements.txt) and installed automatically during the Docker build:
 
-| Package | Declared requirement | Runtime-confirmed version |
-| --- | --- | --- |
-| Django | 4.2.15 | 4.2.15 |
-| django-ninja | 1.3.0 | Not recorded |
-| OpenAI Python SDK | 2.53.0 | 2.53.0 |
-| HTTPX | 0.27.0 | Not recorded |
-| pandas | 1.5.3 | Not recorded |
-| NumPy | 1.26.4 | Not recorded |
-| SciPy | 1.13.1 | Not recorded |
-| Requests | 2.32.3 | Not recorded |
-| tiktoken | >=0.12.0 | Not recorded |
-| WhiteNoise | Not pinned | Not recorded |
+| Package | Version requirement |
+| --- | --- |
+| Django | 4.2.15 |
+| django-ninja | 1.3.0 |
+| OpenAI Python SDK | 2.53.0 |
+| HTTPX | 0.27.0 |
+| pandas | 1.5.3 |
+| NumPy | 1.26.4 |
+| SciPy | 1.13.1 |
+| Requests | 2.32.3 |
+| tiktoken | >=0.12.0 |
+| WhiteNoise | Not pinned |
 
 System dependencies are installed automatically during the Docker build; see [`vasq/Dockerfile`](vasq/Dockerfile). The web interface also loads JavaScript libraries, stylesheets, and fonts from external CDNs, so internet access is required.
 
@@ -84,8 +84,6 @@ Local installation, startup, and an example query were successfully tested on an
 | Container Python | Python 3.11, using `python:3.11-slim` |
 | Django | 4.2.15, confirmed in the startup log |
 | OpenAI Python SDK | 2.53.0, confirmed in the runtime log |
-
-The exact macOS version, Mac chip model, RAM, browser version, Python patch version, and remaining installed package versions were not captured in the supplied test record.
 
 The recorded `docker compose build` wall-clock time was **62.19 seconds (approximately 1 minute)**, including the base-image download and dependency installation. This is the image-build time only; it excludes Docker Desktop installation, code and dataset downloads, API configuration, database initialization, static-file collection, and application startup. Build times vary with hardware, network speed, and Docker caching.
 
