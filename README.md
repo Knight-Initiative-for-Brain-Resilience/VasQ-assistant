@@ -175,7 +175,7 @@ The [Figshare dataset](https://figshare.com/projects/Atlas_of_Regional_Molecular
 
 ### Demo runtime
 
-Observed runs have taken approximately 4–6 minutes per question; this is an indicative estimate, not a macOS desktop benchmark. Local macOS timings are pending. Runtime varies with query complexity, dataset loading, API response times, and web retrieval. In Run Queue mode, questions are processed sequentially, so the total runtime increases with the number of questions.
+Observed runs have taken approximately 4–6 minutes per question. Local macOS timings are pending. Runtime varies with query complexity, dataset loading, API response times, and web retrieval. In Run Queue mode, questions are processed sequentially, so the total runtime increases with the number of questions.
 
 ## Using your own expression data
 
