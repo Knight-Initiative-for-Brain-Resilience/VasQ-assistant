@@ -10,13 +10,7 @@
 
 **[Open VasQ](https://vasq-production-65c6.up.railway.app/vasq/)**
 
-The hosted web interface is **free to use and requires no login**. Open the link in your browser and enter a research question. You do not need to install software, download the dataset, create a Railway account, or supply an OpenAI API key. The hosted service uses the operator's API credentials and infrastructure.
-
-Example questions:
-
-- How do PLVAP, AQP1, and SLCO2A1 rank as markers for fenestrated capillary cells?
-- Which vascular cell types and which brain regions are enriched for small-vessel-disease susceptibility genes?
-- What drugs failed because they cannot cross human BBB due to no route into receptor-mediated transcytosis?
+The hosted web interface is **free to use and requires no login**. Open the link in your browser and enter a research question. You do not need to install software, download the dataset, create a Railway account, or supply an OpenAI API key.
 
 VasQ is intended for research exploration and hypothesis generation, not clinical decision-making.
 
@@ -39,16 +33,16 @@ The atlas covers 41 brain regions, approximately 443,000 nuclei, and approximate
 
 Free access applies to the hosted website. If you run your own copy, you are responsible for its API usage and any hosting costs.
 
-## 2. Run VasQ locally on Linux
+## 2. Run VasQ locally on macOS
 
 ### System requirements
 
-The local instructions below describe a Linux setup using Docker Engine and the Docker Compose plugin. The application runs inside a Linux-based Python container. A Railway account is not required for local installation. Actual tested environment versions are not yet recorded; see the testing notes below.
+The following instructions use Docker Desktop on macOS. VasQ runs inside a Linux-based Python container.
 
 | Component | Requirement or configured version |
 | --- | --- |
-| Container runtime | Docker Engine with the Docker Compose plugin on Linux. The commands below use `docker compose`. |
-| Python inside the container | Python 3.10, configured by `vasq/Dockerfile`. |
+| Container runtime | Docker Desktop for Mac with Docker Compose. Start Docker Desktop before running the commands below. |
+| Python inside the container | Python 3.11 (`python:3.11-slim`), configured by `vasq/Dockerfile`. |
 | Browser | A browser with JavaScript enabled for the web interface. |
 | Network | Required for OpenAI API calls, web retrieval, initial image/package downloads, and browser assets loaded from external CDNs. |
 | API access | Your own OpenAI API key and access to compatible models for your local instance. |
@@ -60,7 +54,7 @@ Git is needed only if you clone the repository rather than download a ZIP. Pytho
 
 ### Software dependencies
 
-The following server dependencies are declared in [`vasq/requirements.txt`](vasq/requirements.txt) in the configuration update accompanying this README:
+Python dependencies are listed in [`vasq/requirements.txt`](vasq/requirements.txt) and installed automatically during the Docker build:
 
 | Package | Declared version |
 | --- | --- |
@@ -75,20 +69,34 @@ The following server dependencies are declared in [`vasq/requirements.txt`](vasq
 | tiktoken | >=0.12.0 |
 | WhiteNoise | Not pinned |
 
-System dependencies are installed automatically during the Docker build; see [`vasq/Dockerfile`](vasq/Dockerfile). The web interface also loads JavaScript libraries, stylesheets, and fonts from external CDNs, so internet access is required. No separate Node.js installation or frontend build is needed.
+System dependencies are installed automatically during the Docker build; see [`vasq/Dockerfile`](vasq/Dockerfile). The web interface also loads JavaScript libraries, stylesheets, and fonts from external CDNs, so internet access is required.
 
-### Tested environments and installation time
+### Test environment and installation time
 
-Python 3.10 describes the local Docker configuration, not a verified test environment. Exact tested Linux distribution/version, Docker/Compose versions, browser versions, and a frozen list of installed package versions have not yet been recorded in the supplied release materials.
+Local validation on macOS is pending. The entries below will be completed after testing; they are not verified requirements or benchmark results.
 
-A typical installation time on a standard desktop computer has not yet been measured. The initial build downloads a Python image and installs dependencies; total setup time also depends on network speed and dataset download size. Record the elapsed build/setup time together with the machine specification before reporting a benchmark.
+| Test detail | Recorded value |
+| --- | --- |
+| macOS version | Pending |
+| Mac model and chip/processor | Pending |
+| RAM | Pending |
+| Docker Desktop and Docker Compose versions | Pending |
+| Container Python version and installed dependency versions | Pending |
+| Browser and version | Pending |
+| Tested code commit and dataset release | Pending |
+| Docker build and initialization time (excluding dataset download) | Pending |
+| Dataset download time and size | Pending |
+| First and subsequent demo query runtimes | Pending |
 
 ### Download the code
 
 ```bash
 git clone --branch railway-deploy https://github.com/Knight-Initiative-for-Brain-Resilience/VasQ-assistant.git
 cd VasQ-assistant
+git rev-parse HEAD
 ```
+
+Run the following setup steps from this repository root. The final command prints the downloaded commit identifier for the test record.
 
 ### Add the expression data
 
@@ -100,7 +108,8 @@ Download the expression data from the [VasQ Figshare project](https://figshare.c
 | `VasQ_cell_meta_table.csv` | Per-nucleus region, region layer, cell class, cell type, age at death, and sex. |
 | `VasQ_gene_names.csv` | Gene symbols in the same order as the matrix columns. |
 
-Docker Compose mounts this directory at /data inside the application container in read-only mode.
+Docker Compose mounts this directory at `/data` inside the application container in read-only mode.
+
 ### Configure your own OpenAI API key
 
 Copy the configuration template:
@@ -130,9 +139,12 @@ Keep `.env-shared` private and excluded from Git and Docker images. Docker Compo
 cd vasq
 docker compose build
 docker compose run --rm web python manage.py migrate --noinput
+docker compose run --rm web python manage.py collectstatic --noinput
 docker compose up
 ```
-For a remote server or computing cluster, use the address provided by your port-forwarding or institutional web access configuration.
+After the application starts, open [VasQ on your computer](http://127.0.0.1:8000/vasq/) in your browser. This address refers to your Mac, with VasQ served on port 8000.
+
+Stop the application by pressing `Ctrl+C` in the terminal.
 
 ## Demo using the Figshare dataset
 
@@ -140,7 +152,7 @@ The [Figshare dataset](https://figshare.com/projects/Atlas_of_Regional_Molecular
 
 ### Run the demo
 
-1. Open your running VasQ instance using the appropriate address described above, or use our hosted VasQ website **[Open VasQ](https://vasq-production-65c6.up.railway.app/vasq/)**.
+1. Open your [local VasQ instance](http://127.0.0.1:8000/vasq/) after starting it, or use our [hosted VasQ website](https://vasq-production-65c6.up.railway.app/vasq/).
 2. Submit each of the following example questions separately:
 
    **Example 1:** How do PLVAP, AQP1, and SLCO2A1 rank as markers for fenestrated capillary cells?
@@ -150,9 +162,8 @@ The [Figshare dataset](https://figshare.com/projects/Atlas_of_Regional_Molecular
    **Example 3:** What drugs failed because they cannot cross human BBB due to no route into receptor-mediated transcytosis?
 
 3. Inspect the response and, where returned, the expression plots and results table. Download the expression table as CSV for expression queries.
-4. Download the single example-output PDF from the [same Figshare project](https://figshare.com/projects/Atlas_of_Regional_Molecular_Specialization_in_the_Human_Brain_Vasculature/273930) to view an actual VasQ response. It illustrates one example only; reference outputs are not provided for all three questions.
 
-### Expected output and reference examples
+### Expected output
 
 | Example | Expected output |
 | --- | --- |
@@ -160,11 +171,11 @@ The [Figshare dataset](https://figshare.com/projects/Atlas_of_Regional_Molecular
 | 2. Small-vessel-disease susceptibility genes | A source-linked discussion of susceptibility genes and their expression patterns across relevant vascular cell types and brain regions, with expression tables and plots where applicable. Expression patterns should be distinguished from a formal statistical enrichment test. |
 | 3. Drug failure, BBB penetration, and receptor-mediated transcytosis | A source-linked assessment of drug-delivery evidence, distinguishing documented BBB penetration limitations from other reasons for failure and identifying whether a proposed transcytosis mechanism is supported. An expression plot or CSV is not required for this evidence-focused question. |
 
-**Run Queue mode:** Enter up to 20 questions, one per line, and click **Run Queue**. VasQ processes each question independently and sequentially, without carrying over conversation history between questions. A separate PDF report is automatically downloaded after each question is processed and for example view in the [VasQ Figshare project](https://figshare.com/projects/Atlas_of_Regional_Molecular_Specialization_in_the_Human_Brain_Vasculature/273930). Each report includes the question, the generated response with source links where provided, and any plots and tables displayed for that question. Full expression results, when available, can be downloaded separately as CSV from the web interface. Allow multiple downloads in your browser if prompted.
+**Run Queue mode:** Enter up to 20 questions, one per line, and click **Run Queue**. VasQ processes each question independently and sequentially, without carrying over conversation history between questions. A separate PDF report is automatically downloaded after each question is processed. Each report includes the question, the generated response with source links where provided, and any plots and tables displayed for that question. Full expression results, when available, can be downloaded separately as CSV from the web interface. Allow multiple downloads in your browser if prompted.
 
 ### Demo runtime
 
-Based on observed runs, each question typically takes approximately 4–6 minutes to complete. Runtime varies with query complexity, dataset loading, API response times, and web retrieval. In Run Queue mode, questions are processed sequentially, so the total runtime increases with the number of questions.
+Observed runs have taken approximately 4–6 minutes per question; this is an indicative estimate, not a macOS desktop benchmark. Local macOS timings are pending. Runtime varies with query complexity, dataset loading, API response times, and web retrieval. In Run Queue mode, questions are processed sequentially, so the total runtime increases with the number of questions.
 
 ## Using your own expression data
 
@@ -194,7 +205,8 @@ To host your own VasQ instance, deploy the repository on Railway using `vasq/Doc
 
 Store the three expression data files in a persistent volume mounted at `/data`; the data files do not need to be uploaded to GitHub.
 
-An independent deployment requires your own Railway account and OpenAI API key, with associated API and hosting costs. 
+An independent deployment requires your own Railway account and OpenAI API key, with associated API and hosting costs.
+
 ## Acknowledgements
 
 VasQ was informed by [scChat](https://github.com/li-group/scChat) and [KG-RAG](https://github.com/BaranziniLab/KG_RAG). We acknowledge their contributions to conversational single-cell analysis and biomedical retrieval.
